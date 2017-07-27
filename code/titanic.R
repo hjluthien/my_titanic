@@ -24,6 +24,11 @@ engineered_data <- full_data %>%
   mutate(title = gsub('(.*, )|(\\..*)', '', full_data$Name)) %>% 
   mutate(family_size = sibling_or_spouse + parent_or_child)
 
-for (i in length(colnames(engineered_data))){
-  sum(is.na(engineered_data[,i]))
-}
+mean_age <- mean(engineered_data$Age, na.rm=TRUE)
+
+imputed_engineered_data <- engineered_data %>% 
+  mutate(
+    ifelse(is.na(engineered_data$Age) == TRUE, mean_age, engineered_data$Age)) %>% 
+  filter(!is.na(Embarked)) %>% 
+  filter(!is.na(Fare))
+
