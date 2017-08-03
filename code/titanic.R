@@ -2,7 +2,8 @@
 library(readr)
 library(ggplot2) 
 library(dplyr) 
-library(mice) 
+library(mice)
+library(InformationValue)
 
 # Read in data ----
 tain_data <- read_csv("~/projects/my_titanic/data/train.csv")
@@ -60,6 +61,9 @@ predicted <- plogis(predict(logitMod, test_data))  # predicted scores
 # or
 predicted <- predict(logitMod, test_data, type="response")  # predicted scores
 
+
+# Validation ----
+
 threshold <- 0.5 #above which they survive, below which they do not
 
 binary_prediction <- data.frame(ifelse(predicted >= 0.5, 1, 0))
@@ -68,3 +72,15 @@ names(binary_prediction) <- "prediction"
 gender_data <- filter(gender_data, PassengerId != 1044)
 
 data <- cbind(gender_data, binary_prediction)
+
+# Percentage mismatch of predcited vs actuals
+misClassError(gender_data$Survived, predicted, threshold = threshold) 
+
+# True Positive Rate
+sensitivity(gender_data$Survived, predicted, threshold = threshold) 
+
+# Percentage of 0’s (actuals) correctly predicted
+specificity(gender_data$Survived, predicted, threshold = threshold) 
+
+confusionMatrix(gender_data$Survived, predicted, threshold = threshold)
+# The columns are actuals, while rows are predicteds.
